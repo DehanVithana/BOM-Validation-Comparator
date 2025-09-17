@@ -24,7 +24,8 @@ def find_best_match(plm_row, sap_df, threshold=80):
     best_score = 0
     
     for _, sap_row in sap_df.iterrows():
-        sap_key = f"{sap_row['Customer Style']}|{sap_row['Comp. Colour']}|{sap_row['Vendor Reference']}"
+        # Corrected line to use the renamed column 'Color Reference'
+        sap_key = f"{sap_row['Customer Style']}|{sap_row['Color Reference']}|{sap_row['Vendor Reference']}"
         
         # Use token set ratio for robust matching
         score = fuzz.token_set_ratio(plm_key.lower(), sap_key.lower())
@@ -88,7 +89,7 @@ def main():
                     'PLM Component': plm_row.get('Vendor Reference'),
                     'PLM Consumption': plm_consumption,
                     'SAP Style': best_match_sap.get('Customer Style') if best_match_sap is not None else 'N/A',
-                    'SAP Color': best_match_sap.get('Comp. Colour') if best_match_sap is not None else 'N/A',
+                    'SAP Color': best_match_sap.get('Color Reference') if best_match_sap is not None else 'N/A',
                     'SAP Component': best_match_sap.get('Vendor Reference') if best_match_sap is not None else 'N/A',
                     'SAP Consumption': sap_consumption,
                     'Similarity Score': score,
