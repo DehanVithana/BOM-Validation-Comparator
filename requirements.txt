@@ -3,3 +3,4 @@ pandas
 fuzzywuzzy
 openpyxl
 matplotlib
+plotly
