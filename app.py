@@ -212,7 +212,8 @@ def run_matching_logic(sap_df, plm_df, size_chart_df, threshold=70):
 
     # Explode sizes: A single PLM row can apply to multiple sizes (e.g., "S,M").
     # We create a separate row for each size.
-    plm_merged_df['Size'] = plm_merged_df['Size'].str.split(',')
+    # FIX: Handle potential non-string or NaN values in the 'Size' column before splitting
+    plm_merged_df['Size'] = plm_merged_df['Size'].fillna('').astype(str).str.split(',')
     plm_exploded_df = plm_merged_df.explode('Size')
     plm_exploded_df['Size'] = plm_exploded_df['Size'].str.strip()
 
@@ -308,9 +309,22 @@ with st.sidebar:
 
 if sap_file and plm_file and size_chart_file:
     try:
-        sap_df = pd.read_csv(sap_file)
-        plm_df = pd.read_csv(plm_file)
-        size_chart_df = pd.read_csv(size_chart_file)
+        # FIX: Handle both CSV and Excel file uploads
+        def read_file(uploaded_file):
+            if uploaded_file.name.endswith('.csv'):
+                return pd.read_csv(uploaded_file)
+            elif uploaded_file.name.endswith('.xlsx'):
+                return pd.read_excel(uploaded_file)
+            else:
+                st.error(f"Unsupported file format: {uploaded_file.name}")
+                return None
+
+        sap_df = read_file(sap_file)
+        plm_df = read_file(plm_file)
+        size_chart_df = read_file(size_chart_file)
+        
+        if sap_df is None or plm_df is None or size_chart_df is None:
+            st.stop() # Stop execution if any file failed to load
 
         # Process data and run matching logic
         final_report_df = run_matching_logic(sap_df, plm_df, size_chart_df, similarity_threshold)
