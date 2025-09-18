@@ -4,3 +4,4 @@ fuzzywuzzy
 openpyxl
 matplotlib
 plotly
+thefuzz
